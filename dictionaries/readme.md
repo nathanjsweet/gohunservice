@@ -1,0 +1,1 @@
+Thanks to [@wooorm](https://github.com/wooorm) for these [dictionaries](https://github.com/wooorm/dictionaries/tree/master/dictionaries)
