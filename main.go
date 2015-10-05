@@ -1,10 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"gohun"
-	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -21,7 +21,7 @@ var (
 	reWord,
 	reChunker *regexp.Regexp
 	dictionaries *string
-	lsResp []byte
+	lsResp       []byte
 )
 
 func init() {
@@ -34,18 +34,18 @@ func init() {
 	dictionaries = flag.String("dictionaries", "", "dictionaries directory location.")
 	flag.Parse()
 
-	if dictionaries == nil || *dictionaries == ""{
+	if dictionaries == nil || *dictionaries == "" {
 		log.Fatal("gohunservice requires a dictionaries path be specified.")
 	}
-	
+
 	dirs, err := ioutil.ReadDir(*dictionaries)
 	logFatalError(err)
-	
+
 	var validDs []string = nil
 	for _, dir := range dirs {
 		if dir.IsDir() {
 			name := dir.Name()
-			validDs = append(validDs, `"` + name + `"`)
+			validDs = append(validDs, `"`+name+`"`)
 			goMap[name] = nil
 		}
 	}
@@ -130,7 +130,7 @@ func getSuggestion(goh *gohun.Gohun, phrase string) (bool, string) {
 		if reWord.MatchString(chunks[i]) {
 			go parseSuggestion(goh, cP, i, c)
 		} else {
-			c <- 0		
+			c <- 0
 		}
 	}
 	t := 0
@@ -156,14 +156,14 @@ func loadDictionary(dictionary string) (*gohun.Gohun, error) {
 	dicChan := make(chan readFileResp)
 	affChan := make(chan readFileResp)
 
-	go readFile(path.Join(*dictionaries, dictionary, dictionary + ".dic"), dicChan)
-	go readFile(path.Join(*dictionaries, dictionary, dictionary + ".aff"), affChan)
-	
-	dResp := <- dicChan
+	go readFile(path.Join(*dictionaries, dictionary, dictionary+".dic"), dicChan)
+	go readFile(path.Join(*dictionaries, dictionary, dictionary+".aff"), affChan)
+
+	dResp := <-dicChan
 	if dResp.err != nil {
 		return nil, dResp.err
 	}
-	aResp := <- affChan
+	aResp := <-affChan
 	if aResp.err != nil {
 		return nil, aResp.err
 	}
@@ -173,8 +173,8 @@ func loadDictionary(dictionary string) (*gohun.Gohun, error) {
 	return goh, nil
 }
 
-type readFileResp struct{
-	err error
+type readFileResp struct {
+	err  error
 	file *[]byte
 }
 
