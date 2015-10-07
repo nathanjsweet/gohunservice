@@ -2,7 +2,7 @@ FROM golang
 
 MAINTAINER Nate Sweet <nathanjsweet@gmail.com>
 
-CMD ["/go/bin/gohunservice --dictionaries=/go/src/gohunservice/dictionaries"]
+CMD ["/go/bin/gohunservice", "-dictionaries=/go/src/gohunservice/dictionaries"]
 
 EXPOSE 8080
 
@@ -12,7 +12,7 @@ RUN git clone --recursive https://github.com/nathanjsweet/gohun.git /go/src/gohu
 RUN cd / && mkdir -p /go/src/gohunservice
 
 # copy gohunservice
-COPY ./dictionaries /go/src/gohunservice/
+COPY ./dictionaries /go/src/gohunservice/dictionaries
 COPY ./main.go /go/src/gohunservice/
 
 RUN go install gohunservice
