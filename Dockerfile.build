@@ -15,4 +15,5 @@ RUN cd / && mkdir -p /go/src/gohunservice
 COPY ./dictionaries /go/src/gohunservice/dictionaries
 COPY ./main.go /go/src/gohunservice/
 
+
 RUN go install gohunservice
