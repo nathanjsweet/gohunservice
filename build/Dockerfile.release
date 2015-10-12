@@ -12,7 +12,7 @@ EXPOSE 8080
 
 CMD ["/bin/gohunservice", "-dictionaries=/go/src/gohunservice/dictionaries"]
 
-COPY ./dictionaries /go/src/gohunservice/dictionaries
+COPY ../dictionaries /go/src/gohunservice/dictionaries
 COPY ./lib/ /lib/
 
 COPY gohunservice /bin/gohunservice
