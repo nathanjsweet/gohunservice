@@ -59,8 +59,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/listdictionaries", lsDictionaries)
 	mux.HandleFunc("/listdictionaries/", lsDictionaries)
-	mux.HandleFunc("/fail", fail)
-	mux.HandleFunc("/fail/", fail)
+	mux.HandleFunc("/spellsuggest", spellSuggestHandler)
 	mux.HandleFunc("/spellsuggest/", spellSuggestHandler)
 	if err := http.ListenAndServe(":"+port, mux); err != nil {
 		log.Fatal("Http failed to bind to port " + port + ", because: " + err.Error())
@@ -122,12 +121,6 @@ func lsDictionaries(rw http.ResponseWriter, req *http.Request) {
 	rw.Header().Set("Content-Type", "application/json")
 	defer req.Body.Close()
 	rw.Write(lsResp)
-}
-
-func fail(rw http.ResponseWriter, req *http.Request) {
-	rw.Header().Set("Content-Type", "application/json")
-	defer req.Body.Close()
-	logFatalError(errors.New("failure!!!!"))
 }
 
 func getSuggestion(goh *gohun.Gohun, phrase string) (bool, string) {
