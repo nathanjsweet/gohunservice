@@ -10,7 +10,6 @@ rm -rf $gohun
 echo "Fetching dependencies:"
 git clone --recursive https://github.com/nathanjsweet/gohun.git $gohun
 cd $gohun
-git reset 4a684448 --hard
 
 echo "Building dependencies:"
 make
@@ -24,25 +23,19 @@ cd $GOPATH/src/github.com/nathanjsweet/gohunservice/build
 cp $GOBIN/gohunservice $gohunservice/build/gohunservice
 cp -r ../dictionaries ./dictionaries
 mkdir -p ./lib
+declare -A libMap
+baseid=$(docker create busybox:ubuntu-14.04 /bin/sleep 10000)
+docker start $baseid
+lsR=$(docker exec $baseid ls /lib)
+while read -r line; do
+    libMap[$line]=1
+done <<< "$lsR"
+docker rm -vf $baseid
 ldd $GOBIN/gohunservice | while read -r line; do
-    name=$(echo "$line" | awk -F "=>" '{print $1}')
+    name=$(echo "$line" | awk -F "=>" '{print $1}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
     pt=$(echo "$line" | awk -F "=>" '{print $2}')
     path=$(echo "$pt" | awk -F " " '{print $1}')
-    if [[ $path =~ \(.* || $path = "" || \
-	$name =~ libm\.so\.6 || \
-        $name =~ ld\-linux\-x86\-64\.so\.2 || \
-	$name =~ libdl\.so\.2 || \
-	$name =~ libnsl\.so\.1 || \
-	$name =~ libnss_dns\.so\.2 || \
-	$name =~ libnss_hesiod\.so\.2 || \
-	$name =~ libnss_nisplus\.so\.2 || \
-	$name =~ libresolv\.so\.2 || \
-	$name =~ libc\.so\.6   || \
-	$name =~ libnss_compat\.so\.2 || \
-	$name =~ libnss_files\.so\.2 || \
-	$name =~ libnss_nis\.so\.2 || \
-	$name =~ libpthread\.so\.0 || \
-	$name =~ librt\.so\.1 ]]
+    if [[ $path =~ \(.* || $path = "" || ${libMap[$name]} = 1 ]]
     then
 	continue
     fi
@@ -50,10 +43,10 @@ ldd $GOBIN/gohunservice | while read -r line; do
 done
 
 echo "Building docker image:"
-docker build -t njs0/gohunservice:release -f Dockerfile.release .
+docker build -t njs0/gohunservice:release .
 
 echo "Cleaning up:"
 rm -rf ./dictionaries
-rm -rf ./lib
+#rm -rf ./lib
 rm gohunservice
 

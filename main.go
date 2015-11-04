@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"gohun"
+	"github.com/nathanjsweet/gohun"
 	"io/ioutil"
 	"log"
 	"net/http"
