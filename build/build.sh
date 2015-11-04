@@ -4,12 +4,14 @@ export GOPATH=$GOPATH
 export GOBIN=$GOPATH/bin
 gohun=$GOPATH/src/github.com/nathanjsweet/gohun
 gohunservice=$GOPATH/src/github.com/nathanjsweet/gohunservice
-echo "Preparing folders:"
-rm -rf $gohun
-
 echo "Fetching dependencies:"
-git clone --recursive https://github.com/nathanjsweet/gohun.git $gohun
+if [ ! -d "$gohun" ]
+then
+    git clone --recursive https://github.com/nathanjsweet/gohun.git $gohun
+fi
 cd $gohun
+git pull origin master
+git reset 6f585f74262aa113a2635528bc28cca8c2a0a03e --hard
 
 echo "Building dependencies:"
 make
@@ -47,6 +49,6 @@ docker build -t njs0/gohunservice:release .
 
 echo "Cleaning up:"
 rm -rf ./dictionaries
-#rm -rf ./lib
+rm -rf ./lib
 rm gohunservice
 
