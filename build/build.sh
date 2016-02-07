@@ -24,7 +24,11 @@ echo "Preparing build folder for docker image:"
 cd $GOPATH/src/github.com/nathanjsweet/gohunservice/build
 cp $GOBIN/gohunservice $gohunservice/build/gohunservice
 cp -r ../dictionaries ./dictionaries
+
+# This is the cool generic stuff about making busy-box
+# correcly grab the necessary lib files.
 mkdir -p ./lib
+# Make map of what libs actually exist in the busy box image.
 declare -A libMap
 baseid=$(docker create busybox:ubuntu-14.04 /bin/sleep 10000)
 docker start $baseid
@@ -33,6 +37,8 @@ while read -r line; do
     libMap[$line]=1
 done <<< "$lsR"
 docker rm -vf $baseid
+# Get a list of the libs that the go binary references, and
+# add the ones that aren't in the busy box libMap
 ldd $GOBIN/gohunservice | while read -r line; do
     name=$(echo "$line" | awk -F "=>" '{print $1}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
     pt=$(echo "$line" | awk -F "=>" '{print $2}')
